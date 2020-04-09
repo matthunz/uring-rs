@@ -30,6 +30,15 @@ pub struct SubmissionQueueEntry {
     pub buf_index: BufIndex,
 }
 
+impl SubmissionQueueEntry {
+    pub fn prep_read_vectored(&mut self, fd: RawFd, buf: &mut [std::io::IoSliceMut]) {
+        self.opcode = 1;
+        self.fd = fd;
+        self.addr = buf.as_mut_ptr() as u64;
+        self.len = buf.len() as u32;
+    }
+}
+
 impl fmt::Debug for SubmissionQueueEntry {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("SubmissionQueueEntry")
