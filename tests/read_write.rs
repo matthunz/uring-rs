@@ -5,11 +5,7 @@ use std::os::unix::io::AsRawFd;
 fn read_write_file() -> io::Result<()> {
     const TEXT: &[u8] = b"Hello World!";
 
-    let (mut sq, mut cq) = uring::IoUring {
-        sq_entries: 2,
-        ..Default::default()
-    }
-    .setup()?;
+    let (mut sq, mut cq) = uring::IoUring::with_entries(2).setup()?;
 
     let f = tempfile::tempfile()?;
 

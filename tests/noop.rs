@@ -2,12 +2,7 @@
 fn noop() {
     const DATA: u64 = 0xDEADBEEF;
 
-    let (mut sq, mut cq) = uring::IoUring {
-        sq_entries: 2,
-        ..Default::default()
-    }
-    .setup()
-    .unwrap();
+    let (mut sq, mut cq) = uring::IoUring::with_entries(2).setup().unwrap();
 
     let sqe = sq.next_sqe().unwrap();
     sqe.user_data = DATA;

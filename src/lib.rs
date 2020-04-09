@@ -45,6 +45,12 @@ impl Default for IoUring {
 }
 
 impl IoUring {
+    pub fn with_entries(sq_entries: u32) -> Self {
+        Self {
+            sq_entries,
+            ..Default::default()
+        }
+    }
     pub fn setup(&mut self) -> io::Result<(SubmissionQueue, CompletionQueue)> {
         to_result(unsafe {
             const IO_URING_SETUP: isize = 425;
