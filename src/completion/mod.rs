@@ -9,7 +9,7 @@ pub struct CompletionQueueEntry {
     pub res: i32,
     pub flags: u32,
 }
-
+#[derive(Debug)]
 pub struct CompletionQueue {
     pub fd: RawFd,
     pub queue: Queue<CompletionQueueEntry>,

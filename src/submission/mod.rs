@@ -5,6 +5,7 @@ mod entry;
 pub use self::entry::SubmissionQueueEntry;
 
 // TODO MUNMAP
+#[derive(Debug)]
 pub struct SubmissionQueue {
     pub queue: Queue<SubmissionQueueEntry>,
     pub array: NonNull<u32>,

@@ -1,5 +1,6 @@
 use std::ptr::NonNull;
 
+#[derive(Debug)]
 pub struct Queue<E> {
     pub head: NonNull<u32>,
     pub tail: NonNull<u32>,
