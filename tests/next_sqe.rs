@@ -1,12 +1,11 @@
-use uring::Params;
-
 #[test]
 fn next_sqe() {
     const ENTRIES: u32 = 2;
-    let (mut sq, _) = uring::setup(Params {
+    let (mut sq, _) = uring::IoUring {
         sq_entries: ENTRIES,
         ..Default::default()
-    })
+    }
+    .setup()
     .unwrap();
 
     for _ in 0..ENTRIES {

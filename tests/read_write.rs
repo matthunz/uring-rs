@@ -1,15 +1,15 @@
 use std::io::{self, IoSlice, IoSliceMut};
 use std::os::unix::io::AsRawFd;
-use uring::Params;
 
 #[test]
 fn read_write_file() -> io::Result<()> {
     const TEXT: &[u8] = b"Hello World!";
 
-    let (mut sq, mut cq) = uring::setup(Params {
+    let (mut sq, mut cq) = uring::IoUring {
         sq_entries: 2,
         ..Default::default()
-    })?;
+    }
+    .setup()?;
 
     let f = tempfile::tempfile()?;
 
