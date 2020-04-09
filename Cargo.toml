@@ -3,9 +3,15 @@ name = "uring"
 version = "0.1.0"
 authors = ["Matt Hunzinger <matthunz2@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "Pure Rust library for io_uring"
+readme = "README.md"
+repository = "https://github.com/matthunz/uring-rs"
+documentation = "https://docs.rs/crate/uring"
+keywords = ["io_uring", "linux", "asynchronous"]
 
 [dependencies]
-sys-call = { git = "https://github.com/matthunz/sys-call-rs" }
+sys-call = "0.1"
 
 [dev-dependencies]
 tempfile = "3.1.0"
