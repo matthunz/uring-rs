@@ -27,15 +27,17 @@ impl CompletionQueue {
             sys_call!(IO_URING_ENTER, self.fd as isize, submit, count, 1, 0)
         })
     }
-    pub fn next_cqe(&self) -> Option<&CompletionQueueEntry> {
+    pub fn next_cqe(&mut self) -> Option<&CompletionQueueEntry> {
         if unsafe { self.head.as_ref() != self.tail.as_ref() } {
             Some(unsafe { self.next_cqe_unchecked() })
         } else {
             None
         }
     }
-    pub unsafe fn next_cqe_unchecked(&self) -> &CompletionQueueEntry {
+    pub unsafe fn next_cqe_unchecked(&mut self) -> &CompletionQueueEntry {
         let index = self.head.as_ref() & self.mask.as_ref();
+        *self.head.as_mut() += 1;
+
         &*self.cqes.as_ptr().offset(index as isize)
     }
 }

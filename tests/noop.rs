@@ -4,7 +4,7 @@ use uring::Params;
 fn noop() {
     const DATA: u64 = 0xDEADBEEF;
 
-    let (mut sq, cq) = uring::setup(Params {
+    let (mut sq, mut cq) = uring::setup(Params {
         sq_entries: 2,
         ..Default::default()
     })
@@ -17,5 +17,7 @@ fn noop() {
     cq.wait_for_cqes(1, 1).unwrap();
 
     let cqe = cq.next_cqe().unwrap();
-    assert_eq!(cqe.user_data, DATA)
+    assert_eq!(cqe.user_data, DATA);
+
+    assert!(cq.next_cqe().is_none())
 }
