@@ -7,8 +7,8 @@ pub use self::entry::SubmissionQueueEntry;
 // TODO MUNMAP
 #[derive(Debug)]
 pub struct SubmissionQueue {
-    pub queue: Queue<SubmissionQueueEntry>,
-    pub array: NonNull<u32>,
+    pub(super) queue: Queue<SubmissionQueueEntry>,
+    pub(super) array: NonNull<u32>,
 }
 
 impl SubmissionQueue {

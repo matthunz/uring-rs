@@ -11,8 +11,8 @@ pub struct CompletionQueueEntry {
 }
 #[derive(Debug)]
 pub struct CompletionQueue {
-    pub fd: RawFd,
-    pub queue: Queue<CompletionQueueEntry>,
+    pub(super) fd: RawFd,
+    pub(super) queue: Queue<CompletionQueueEntry>,
 }
 
 impl CompletionQueue {
