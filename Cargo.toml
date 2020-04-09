@@ -6,3 +6,6 @@ edition = "2018"
 
 [dependencies]
 sys-call = { git = "https://github.com/matthunz/sys-call-rs" }
+
+[dev-dependencies]
+tempfile = "3.1.0"

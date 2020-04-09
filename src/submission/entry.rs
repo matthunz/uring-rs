@@ -1,4 +1,5 @@
 use std::fmt;
+use std::io::{IoSliceMut, IoSlice};
 use std::os::unix::io::RawFd;
 
 #[repr(C)]
@@ -31,10 +32,16 @@ pub struct SubmissionQueueEntry {
 }
 
 impl SubmissionQueueEntry {
-    pub fn prep_read_vectored(&mut self, fd: RawFd, buf: &mut [std::io::IoSliceMut]) {
+    pub fn prep_read_vectored(&mut self, fd: RawFd, buf: &mut [IoSliceMut]) {
         self.opcode = 1;
         self.fd = fd;
         self.addr = buf.as_mut_ptr() as u64;
+        self.len = buf.len() as u32;
+    }
+    pub fn prep_write_vectored(&mut self, fd: RawFd, buf: &[IoSlice]) {
+        self.opcode = 2;
+        self.fd = fd;
+        self.addr = buf.as_ptr() as u64;
         self.len = buf.len() as u32;
     }
 }
