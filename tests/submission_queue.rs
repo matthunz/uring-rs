@@ -3,7 +3,7 @@ use uring::Params;
 #[test]
 fn next_sqe() {
     const ENTRIES: u32 = 2;
-    let mut sq = uring::setup(Params {
+    let (mut sq, _) = uring::setup(Params {
         sq_entries: ENTRIES,
         ..Default::default()
     })

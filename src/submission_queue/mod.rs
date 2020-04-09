@@ -27,10 +27,18 @@ impl SubmissionQueue {
         }
     }
     pub unsafe fn next_sqe_unchecked(&mut self) -> &mut SubmissionQueueEntry {
-        let index = self.tail.as_ref() & self.mask.as_ref();
-        *self.array.as_ptr().offset(index as isize) = index;
+        let index = self.index() as isize;
         *self.tail.as_mut() += 1;
 
-        &mut *self.sqes.as_ptr().offset(index as isize)
+        &mut *self.sqes.as_ptr().offset(index)
+    }
+    pub fn submit_sqe(&mut self) {
+        let index = self.index();
+        unsafe {
+            *self.array.as_ptr().offset(index as isize) = index;
+        }
+    }
+    pub fn index(&self) -> u32 {
+        unsafe { self.tail.as_ref() & self.mask.as_ref() }
     }
 }
