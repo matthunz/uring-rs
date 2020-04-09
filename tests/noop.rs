@@ -14,7 +14,7 @@ fn noop() {
     sqe.user_data = DATA;
     sq.submit_sqe();
 
-    cq.wait_for_cqes(1, 1).unwrap();
+    cq.wait_for_cqe().unwrap();
 
     let cqe = cq.next_cqe().unwrap();
     assert_eq!(cqe.user_data, DATA);

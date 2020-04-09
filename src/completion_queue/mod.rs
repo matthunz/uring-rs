@@ -21,10 +21,13 @@ pub struct CompletionQueue {
 }
 
 impl CompletionQueue {
-    pub fn wait_for_cqes(&self, submit: isize, count: isize) -> io::Result<isize> {
+    pub fn wait_for_cqe(&self) -> io::Result<isize> {
+        self.wait_for_cqes(1, 1)
+    }
+    pub fn wait_for_cqes(&self, to_submit: isize, count: isize) -> io::Result<isize> {
         to_result(unsafe {
             const IO_URING_ENTER: isize = 426;
-            sys_call!(IO_URING_ENTER, self.fd as isize, submit, count, 1, 0)
+            sys_call!(IO_URING_ENTER, self.fd as isize, to_submit, count, 1, 0)
         })
     }
     pub fn next_cqe(&mut self) -> Option<&CompletionQueueEntry> {
