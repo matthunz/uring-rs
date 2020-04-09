@@ -7,11 +7,14 @@ use sys_call::sys_call;
 pub mod params;
 pub use params::Params;
 
-mod completion_queue;
-pub use completion_queue::{CompletionQueue, CompletionQueueEntry};
+mod queue;
+pub use queue::Queue;
 
-mod submission_queue;
-pub use submission_queue::{SubmissionQueue, SubmissionQueueEntry};
+mod completion;
+pub use completion::{CompletionQueue, CompletionQueueEntry};
+
+mod submission;
+pub use submission::{SubmissionQueue, SubmissionQueueEntry};
 
 pub fn setup(mut params: Params) -> io::Result<(SubmissionQueue, CompletionQueue)> {
     to_result(unsafe {
@@ -59,20 +62,24 @@ pub fn setup(mut params: Params) -> io::Result<(SubmissionQueue, CompletionQueue
                     unsafe {
                         (
                             SubmissionQueue {
-                                entries: params.sq_entries,
-                                head: field(sq_ptr, params.sq_off.head),
-                                tail: field(sq_ptr, params.sq_off.tail),
-                                mask: field(sq_ptr, params.sq_off.ring_mask),
+                                queue: Queue {
+                                    head: field(sq_ptr, params.sq_off.head),
+                                    tail: field(sq_ptr, params.sq_off.tail),
+                                    mask: field(sq_ptr, params.sq_off.ring_mask),
+                                    len: params.sq_entries,
+                                    entries: NonNull::new_unchecked(sqes),
+                                },
                                 array: field(sq_ptr, params.sq_off.array),
-                                sqes: NonNull::new_unchecked(sqes),
                             },
                             CompletionQueue {
                                 fd: fd as RawFd,
-                                entries: params.cq_entries,
-                                head: field(cq_ptr, params.cq_off.head),
-                                tail: field(cq_ptr, params.cq_off.tail),
-                                mask: field(cq_ptr, params.cq_off.ring_mask),
-                                cqes: NonNull::new_unchecked(cqes),
+                                queue: Queue {
+                                    head: field(cq_ptr, params.cq_off.head),
+                                    tail: field(cq_ptr, params.cq_off.tail),
+                                    mask: field(cq_ptr, params.cq_off.ring_mask),
+                                    len: params.cq_entries,
+                                    entries: NonNull::new_unchecked(cqes),
+                                },
                             },
                         )
                     }

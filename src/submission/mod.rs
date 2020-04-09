@@ -1,3 +1,4 @@
+use crate::Queue;
 use std::ptr::NonNull;
 
 mod entry;
@@ -5,21 +6,17 @@ pub use self::entry::SubmissionQueueEntry;
 
 // TODO MUNMAP
 pub struct SubmissionQueue {
-    pub entries: u32,
-    pub head: NonNull<u32>,
-    pub tail: NonNull<u32>,
-    pub mask: NonNull<u32>,
+    pub queue: Queue<SubmissionQueueEntry>,
     pub array: NonNull<u32>,
-    pub sqes: NonNull<SubmissionQueueEntry>,
 }
 
 impl SubmissionQueue {
     pub fn next_sqe(&mut self) -> Option<&mut SubmissionQueueEntry> {
-        let tail = unsafe { self.tail.as_mut() };
-        let head = unsafe { self.head.as_ref() };
+        let tail = unsafe { self.queue.tail.as_mut() };
+        let head = unsafe { self.queue.head.as_ref() };
         let next = *tail + 1;
 
-        if next - head <= self.entries {
+        if next - head <= self.queue.len {
             let sqe = unsafe { self.next_sqe_unchecked() };
             Some(sqe)
         } else {
@@ -28,9 +25,9 @@ impl SubmissionQueue {
     }
     pub unsafe fn next_sqe_unchecked(&mut self) -> &mut SubmissionQueueEntry {
         let index = self.index() as isize;
-        *self.tail.as_mut() += 1;
+        *self.queue.tail.as_mut() += 1;
 
-        &mut *self.sqes.as_ptr().offset(index)
+        &mut *self.queue.entries.as_ptr().offset(index)
     }
     pub fn submit_sqe(&mut self) {
         let index = self.index();
@@ -39,6 +36,6 @@ impl SubmissionQueue {
         }
     }
     pub fn index(&self) -> u32 {
-        unsafe { self.tail.as_ref() & self.mask.as_ref() }
+        unsafe { self.queue.tail.as_ref() & self.queue.mask.as_ref() }
     }
 }

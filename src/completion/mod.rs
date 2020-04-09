@@ -1,7 +1,6 @@
-use crate::to_result;
+use crate::{to_result, Queue};
 use std::io;
 use std::os::unix::io::RawFd;
-use std::ptr::NonNull;
 use sys_call::sys_call;
 
 #[derive(Debug)]
@@ -13,11 +12,7 @@ pub struct CompletionQueueEntry {
 
 pub struct CompletionQueue {
     pub fd: RawFd,
-    pub entries: u32,
-    pub head: NonNull<u32>,
-    pub tail: NonNull<u32>,
-    pub mask: NonNull<u32>,
-    pub cqes: NonNull<CompletionQueueEntry>,
+    pub queue: Queue<CompletionQueueEntry>,
 }
 
 impl CompletionQueue {
@@ -31,16 +26,16 @@ impl CompletionQueue {
         })
     }
     pub fn next_cqe(&mut self) -> Option<&CompletionQueueEntry> {
-        if unsafe { self.head.as_ref() != self.tail.as_ref() } {
+        if unsafe { self.queue.head.as_ref() != self.queue.tail.as_ref() } {
             Some(unsafe { self.next_cqe_unchecked() })
         } else {
             None
         }
     }
     pub unsafe fn next_cqe_unchecked(&mut self) -> &CompletionQueueEntry {
-        let index = self.head.as_ref() & self.mask.as_ref();
-        *self.head.as_mut() += 1;
+        let index = self.queue.head.as_ref() & self.queue.mask.as_ref();
+        *self.queue.head.as_mut() += 1;
 
-        &*self.cqes.as_ptr().offset(index as isize)
+        &*self.queue.entries.as_ptr().offset(index as isize)
     }
 }
